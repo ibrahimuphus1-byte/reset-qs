@@ -3,6 +3,7 @@ package com.example.qscolumns
 import android.graphics.drawable.Icon
 import android.widget.Toast
 import io.github.libxposed.api.XposedHelpers
+import io.github.libxposed.api.XposedModuleInterface
 
 object RestartSystemUITile {
     private val STATE_CLASS = "com.android.systemui.qs.QSTile.State"
@@ -16,15 +17,18 @@ object RestartSystemUITile {
             XposedHelpers.findAndHookMethod(
                 qsTileClass,
                 "handleClick",
-                XposedModuleInterface.MethodHooker { _ ->
-                    try {
-                        val context = XposedHelpers.callMethod(host, "getContext") as android.content.Context
-                        Runtime.getRuntime().exec("su -c am restart com.android.systemui")
-                        Toast.makeText(context, "Restarting SystemUI...", Toast.LENGTH_SHORT).show()
-                    } catch (_: Throwable) {
+                object : XposedModuleInterface.MethodHooker {
+                    override fun beforeHookedMethod(param: XposedModuleInterface.MethodHookParam) {}
+                    override fun afterHookedMethod(param: XposedModuleInterface.MethodHookParam) {
                         try {
-                            Runtime.getRuntime().exec("su -c pkill -f com.android.systemui")
-                        } catch (_: Throwable) { }
+                            val context = XposedHelpers.callMethod(host, "getContext") as android.content.Context
+                            Runtime.getRuntime().exec("su -c am restart com.android.systemui")
+                            Toast.makeText(context, "Restarting SystemUI...", Toast.LENGTH_SHORT).show()
+                        } catch (_: Throwable) {
+                            try {
+                                Runtime.getRuntime().exec("su -c pkill -f com.android.systemui")
+                            } catch (_: Throwable) { }
+                        }
                     }
                 }
             )
@@ -33,8 +37,11 @@ object RestartSystemUITile {
             XposedHelpers.findAndHookMethod(
                 qsTileClass,
                 "getTileLabel",
-                XposedModuleInterface.MethodHooker { paramHook ->
-                    paramHook.result = "Restart SystemUI"
+                object : XposedModuleInterface.MethodHooker {
+                    override fun beforeHookedMethod(param: XposedModuleInterface.MethodHookParam) {}
+                    override fun afterHookedMethod(param: XposedModuleInterface.MethodHookParam) {
+                        param.result = "Restart SystemUI"
+                    }
                 }
             )
 
@@ -42,15 +49,18 @@ object RestartSystemUITile {
             XposedHelpers.findAndHookMethod(
                 qsTileClass,
                 "getState",
-                XposedModuleInterface.MethodHooker { paramHook ->
-                    val state = XposedHelpers.callConstructor(
-                        XposedHelpers.findClass(STATE_CLASS, classLoader)
-                    )
-                    val context = XposedHelpers.callMethod(host, "getContext") as android.content.Context
-                    val icon = Icon.createWithResource(context, android.R.drawable.ic_menu_rotate)
-                    XposedHelpers.setObjectField(state, "icon", icon)
-                    XposedHelpers.setObjectField(state, "label", "Restart SystemUI")
-                    paramHook.result = state
+                object : XposedModuleInterface.MethodHooker {
+                    override fun beforeHookedMethod(param: XposedModuleInterface.MethodHookParam) {}
+                    override fun afterHookedMethod(param: XposedModuleInterface.MethodHookParam) {
+                        val state = XposedHelpers.callConstructor(
+                            XposedHelpers.findClass(STATE_CLASS, classLoader)
+                        )
+                        val context = XposedHelpers.callMethod(host, "getContext") as android.content.Context
+                        val icon = Icon.createWithResource(context, android.R.drawable.ic_menu_rotate)
+                        XposedHelpers.setObjectField(state, "icon", icon)
+                        XposedHelpers.setObjectField(state, "label", "Restart SystemUI")
+                        param.result = state
+                    }
                 }
             )
 
