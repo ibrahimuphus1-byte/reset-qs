@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:   # Enables the "Run workflow" button in GitHub Actions
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,9 +23,11 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: '8.2'          # Fixed version
 
       - name: Build Debug APK
-        run: gradle assembleDebug   # No ./gradlew needed
+        run: gradle assembleDebug
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
