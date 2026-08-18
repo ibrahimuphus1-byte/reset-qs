@@ -24,7 +24,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          gradle-version: '8.2'          # Fixed version
+          gradle-version: '8.2'
 
       - name: Build Debug APK
         run: gradle assembleDebug
