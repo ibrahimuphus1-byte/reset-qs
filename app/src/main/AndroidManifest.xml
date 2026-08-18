@@ -11,7 +11,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Set QS columns to 5 & add Restart SystemUI tile" />
+            android:value="Set QS columns to 5 and add Restart SystemUI tile" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
