@@ -32,7 +32,5 @@ android {
 }
 
 dependencies {
-    // Xposed API - compileOnly
-    compileOnly("de.robv.android.xposed:api:82")
-    compileOnly("de.robv.android.xposed:api:82:sources")
+    compileOnly("io.github.libxposed:api:101.0.1")
 }
